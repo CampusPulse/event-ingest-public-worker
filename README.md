@@ -1,9 +1,9 @@
 # vaccine-feed-ingest-public-worker
 
 <!-- markdownlint-disable MD013 -->
-| environment | repo ingest | private load |
-|-|-|-|
-| prod | [![production - repo - all stages / all sites](https://github.com/CAVaccineInventory/vaccine-feed-ingest-public-worker/actions/workflows/production-worker-repo.yml/badge.svg?branch=main)](https://github.com/CAVaccineInventory/vaccine-feed-ingest-public-worker/actions/workflows/production-worker-repo.yml) | [![production - private - load-to-vial](https://github.com/CAVaccineInventory/vaccine-feed-ingest-public-worker/actions/workflows/production-loader-private-gcs.yml/badge.svg?branch=main)](https://github.com/CAVaccineInventory/vaccine-feed-ingest-public-worker/actions/workflows/production-loader-private-gcs.yml) |
+| environment | repo ingest | public ingest + load | private load |
+|-|-|-|-|
+| prod | [![production - repo - all stages / all sites](https://github.com/CAVaccineInventory/vaccine-feed-ingest-public-worker/actions/workflows/production-worker-repo.yml/badge.svg?branch=main)](https://github.com/CAVaccineInventory/vaccine-feed-ingest-public-worker/actions/workflows/production-worker-repo.yml) | [![production - public - worker](https://github.com/CAVaccineInventory/vaccine-feed-ingest-public-worker/actions/workflows/production-worker-gcs.yml/badge.svg?branch=main)](https://github.com/CAVaccineInventory/vaccine-feed-ingest-public-worker/actions/workflows/production-worker-gcs.yml) | [![production - private - load-to-vial](https://github.com/CAVaccineInventory/vaccine-feed-ingest-public-worker/actions/workflows/production-loader-private-gcs.yml/badge.svg?branch=main)](https://github.com/CAVaccineInventory/vaccine-feed-ingest-public-worker/actions/workflows/production-loader-private-gcs.yml) |
 <!-- markdownlint-restore -->
 
 [`vaccine-feed-ingest`](https://github.com/CAVaccineInventory/vaccine-feed-ingest) is an open-source repo which accepts contributions of ingestors from the public.
