@@ -1,0 +1,87 @@
+---
+name: "[production] [private-gcs] load-to-vial"
+on:
+  workflow_dispatch:
+  schedule:
+      # 09:07, 21:07 in PDT
+      - cron: '7 4,16 * * *'
+
+env:
+  SENTRY_ENABLE: 1
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+
+jobs:
+  gcs-loader:
+    environment: production
+    timeout-minutes: 180
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' }}
+    steps:
+      - name: apt-get dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install libbz2-dev liblzma-dev libreadline-dev libsqlite3-dev pdftohtml
+
+      - uses: actions/checkout@v2
+        with:
+          repository: CAVaccineInventory/vaccine-feed-ingest
+          path: ./vaccine-feed-ingest/
+          submodules: true
+
+      - name: get python version
+        working-directory: vaccine-feed-ingest
+        run: |
+          python_version=$(cat .python-version)
+          echo "python_version=${python_version}" >> $GITHUB_ENV
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ env.python_version }}
+
+      - name: setup from README.md
+        run: |
+          curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+          echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+
+      - name: load poetry install from cache
+        id: cached-poetry-dependencies
+        uses: actions/cache@v2
+        with:
+          path: vaccine-feed-ingest/.venv
+          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+      - run: poetry install
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        working-directory: vaccine-feed-ingest
+
+      - uses: google-github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCS_PRIVATE_STORAGE_KEY }}
+          export_default_credentials: true
+
+      - name: run enrich, load-to-vial
+        working-directory: vaccine-feed-ingest
+        if: ${{ github.ref == 'refs/heads/main' }}
+        env:
+          OUTPUT_DIR: ${{ secrets.GCS_PRIVATE_OUTPUT_DIR }}
+          VIAL_SERVER: ${{ secrets.VIAL_URI }}
+          VIAL_APIKEY: ${{ secrets.VIAL_API_KEY }}
+          PLACEKEY_APIKEY: ${{ secrets.API_PLACEKEY_KEY }}
+          GEOCODIO_APIKEY: ${{ secrets.API_GEOCODIO_KEY }}
+        run: |
+          poetry run vaccine-feed-ingest pipeline us/vaccinefinder_org --stages=enrich,load-to-vial --enrich-apis=placekey,geocodio --match --create
+
+  notify:
+    environment: production
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    needs:
+      - gcs-loader
+    if: ${{ always() && github.ref == 'refs/heads/main' }}
+    steps:
+      - uses: nobrayner/discord-webhook@v1
+        with:
+          username: "[production] private data pipeline"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          discord-webhook: ${{ secrets.DISCORD_WEBHOOK }}
