@@ -127,7 +127,7 @@ jobs:
           PLACEKEY_APIKEY: ${{ secrets.API_PLACEKEY_KEY }}
           GEOCODIO_APIKEY: ${{ secrets.API_GEOCODIO_KEY }}
         run: |
-          poetry run vaccine-feed-ingest pipeline --stages=enrich,load-to-vial --enrich-apis=placekey,geocodio --no-match --no-create --exclude-sites us/giscorps_vaccine_providers
+          poetry run vaccine-feed-ingest pipeline --stages=enrich,load-to-vial --enrich-apis=placekey,geocodio --match --create --exclude-sites us/giscorps_vaccine_providers
 
   notify:
     environment: production
