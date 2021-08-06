@@ -2,9 +2,6 @@
 name: "[production] [gcs] all stages / all sites"
 on:
   workflow_dispatch:
-  schedule:
-      # 6:07, 18:07 in PDT
-      - cron: '7 1,13 * * *'
 
 env:
   SENTRY_ENABLE: 1
