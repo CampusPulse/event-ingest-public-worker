@@ -61,29 +61,17 @@ jobs:
           mkdir ../results
           poetry run event-data-ingest pipeline --stages=fetch,parse,normalize --output-dir ../results --no-fail-on-runner-error
 
-      # - name: roll-up results
-      #   working-directory: results
-      #   run: |
-      #     results_repo="../{{ env.RESULTS_REPO }}"
-      #     for state in *; do
-      #     if [ -d "$state" ]; then
-      #         for site in "$state"/*; do
-      #         if [ -d "$site" ]; then
-      #             for stage in "$site"/*; do
-      #             if [ -d "$stage" ]; then
-      #                 for timedir in "$stage"/*; do
-      #                 if [ -d "$timedir" ]; then
-      #                     result_repo_stage="$results_repo/$stage/"
-      #                     mkdir -p "$result_repo_stage"
-      #                     mv "$timedir"/* "$result_repo_stage"
-      #                 fi
-      #                 done
-      #             fi
-      #             done
-      #         fi
-      #         done
-      #     fi
-      #     done
+      - name: roll-up results
+        working-directory: results
+        run: |
+          find out -type f -mtime -1 -exec ls -lt {} + | grep "normalized" | awk '{print $NF}' 2> /dev/null |xargs cat > "concatenated_events.parsed.normalized.ndjson"
+      
+      - name: upload results
+        working-directory: results
+        run: | 
+          curl -X POST "https://api.events.campuspulse.app/v0/import" \
+          -u "loader:${{ secrets.API_PASSWORD }}" \
+          -F "file=@concatenated_events.parsed.normalized.ndjson"
 
       # - run: git status
       #   working-directory: '{{ env.RESULTS_REPO }}'
