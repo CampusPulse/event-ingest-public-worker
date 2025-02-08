@@ -25,12 +25,12 @@ jobs:
 
       # - uses: actions/checkout@v2
       #   with:
-      #     repository: CAVaccineInventory/event-feed-ingest-results
+      #     repository: CAVaccineInventory/event-data-ingest-results
       #     path: ./{{ env.RESULTS_REPO }}/
       #     token: ${{ secrets.WORKER_PAT }}
 
       - name: get python version
-        working-directory: event-feed-ingest
+        working-directory: event-data-ingest
         run: |
           python_version=$(cat .python-version)
           echo "python_version=${python_version}" >> $GITHUB_ENV
@@ -48,18 +48,18 @@ jobs:
         id: cached-poetry-dependencies
         uses: actions/cache@v2
         with:
-          path: event-feed-ingest/.venv
+          path: event-data-ingest/.venv
           key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
 
       - run: poetry install
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        working-directory: event-feed-ingest
+        working-directory: event-data-ingest
 
       - name: run fetch, parse, normalize
-        working-directory: event-feed-ingest
+        working-directory: event-data-ingest
         run: |
           mkdir ../results
-          poetry run event-feed-ingest pipeline --stages=fetch,parse,normalize --output-dir ../results --no-fail-on-runner-error
+          poetry run event-data-ingest pipeline --stages=fetch,parse,normalize --output-dir ../results --no-fail-on-runner-error
 
       # - name: roll-up results
       #   working-directory: results
