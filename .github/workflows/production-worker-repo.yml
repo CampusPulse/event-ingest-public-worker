@@ -41,8 +41,8 @@ jobs:
 
       - name: setup from README.md
         run: |
-          curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
-          echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+          curl -sSL https://install.python-poetry.org/ | python -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: load poetry install from cache
         id: cached-poetry-dependencies
