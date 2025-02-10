@@ -2,7 +2,7 @@
 name: "[production] [repo] all stages / all sites"
 on:
   schedule:
-    cron: "48 6 * * 2" # “At 06:48 on Tuesday.” Github doesnt like stuff at the top of the hour and weekly seems often enough, while also giving RIT people one workday to set up events for the week
+    - cron: "48 6 * * 2" # “At 06:48 on Tuesday.” Github doesnt like stuff at the top of the hour and weekly seems often enough, while also giving RIT people one workday to set up events for the week
 
 jobs:
   repo-worker:
