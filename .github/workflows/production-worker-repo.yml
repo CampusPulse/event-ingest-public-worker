@@ -71,7 +71,7 @@ jobs:
       - name: upload results
         working-directory: results
         run: | 
-          curl -X POST "https://api.events.campuspulse.app/v0/import" \
+          curl -X POST --fail-with-body "https://api.events.campuspulse.app/v0/import" \
           -u "loader:${{ secrets.API_PASSWORD }}" \
           -F "file=@concatenated_events.parsed.normalized.ndjson"
 
