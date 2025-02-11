@@ -47,7 +47,7 @@ jobs:
 
       - name: load poetry install from cache
         id: cached-poetry-dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: event-data-ingest/.venv
           key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
